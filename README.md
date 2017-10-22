@@ -52,21 +52,21 @@ mkdir gridpacks/TrijetRes_g_ggg_BP2_testV1
 cp genproductions/bin/MadGraph5_aMCatNLO/TrijetRes_g_ggg_BP2_testV1*tarball.tar.xz gridpacks/TrijetRes_g_ggg_BP2_testV1
 ```
 
-6) Get generator information from the process
-* Create CMSSW area and set environment variables
+6) Produce LHE file and get generator level information
+* Create CMSSW area and set environment variables (same scram arch and cmssw release used to produce gridpacks at point 4)
 ```
-scram p CMSSW_9_2_7
-cd CMSSW_9_2_7
+scram p CMSSW_7_1_30
+cd CMSSW_7_1_30
 cmsenv
 cd ..
 ```
-* Create and edit script to extract generator info (use getGenInfo.py as template, depends on the specific model)
+* Create and edit script (use getLHEandGenInfo.py as template, depends on the specific model)
 ```
-cp getGenInfo.py getGenInfo_TrijetRes.py
+cp getLHEandGenInfo.py getLHEandGenInfo_TrijetRes.py
 ```
-* Extract generator info from gridpacks
+* Create LHE files and extract generator info from gridpacks (can also be run without  --createLHE option, in which case only the root tree with gen level info is created)
 ```
-python getGenInfo_TrijetRes.py -i gridpacks/TrijetRes_g_ggg_BP2_testV1 -n TrijetRes_g_ggg_BP2_testV1 -t /tmp/santanas
+python getLHEandGenInfo_TrijetRes.py -i gridpacks/TrijetRes_g_ggg_BP2_testV1 -n TrijetRes_g_ggg_BP2_testV1 -t /tmp/santanas --getGenInfo --createLHE --numberOfLHEevents 100 --EOSdir /eos/cms/store/cmst3/user/santanas/MCsamples
 ```
 * An output root tree is created in *gridpacks/TrijetRes_g_ggg_BP2_testV1/tree_TrijetRes_g_ggg_BP2_testV1.root* containing some generator level info (below the example for the trijet resonance model):
    * xsec: cross section (pb)
@@ -76,7 +76,7 @@ python getGenInfo_TrijetRes.py -i gridpacks/TrijetRes_g_ggg_BP2_testV1 -n Trijet
    * rmass: Radion mass (GeV)
    * rwidth: Radion width (GeV)
    * rbr: Radion BR (in the decay of interest: here "gluon+gluon")
-
+* The LHE files are stored in the specified eos directory, i.e. in this case */eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1* (together with gen info if --getGenInfo is set)
 
 
 

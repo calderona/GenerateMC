@@ -16,7 +16,7 @@ print basedir_path
 madgraph_dir = "genproductions/bin/MadGraph5_aMCatNLO"
 
 usage = ""
-parser = optparse.OptionParser(usage='\nExample: python %prog -i gridpacks/TrijetRes_g_ggg_BP2_test -n TrijetRes_g_ggg_BP2_test -t /tmp/santanas --getGenInfo \n1) enter in a CMSSW area and do cmsenv \n2) Copy by hand new gridpacks (typically created in genproductions/bin/MadGraph5_aMCatNLO) in a new directory (i.e. gridpacks/TrijetRes_g_ggg_BP2_test) \n3) Launch the script %prog: the code creates a root file with the gen info of the produced samples (if --getGenInfo is enabled) and/or create an LHE file (if --createLHE is enabled)')
+parser = optparse.OptionParser(usage='\nExample: python %prog -i gridpacks/TrijetRes_g_ggg_BP2_test -n TrijetRes_g_ggg_BP2_test -t /tmp/santanas --getGenInfo --createLHE --EOSdir /eos/cms/store/cmst3/user/santanas/MCsamples \n1) enter in a CMSSW area and do cmsenv \n2) Copy by hand new gridpacks (typically created in genproductions/bin/MadGraph5_aMCatNLO) in a new directory (i.e. gridpacks/TrijetRes_g_ggg_BP2_test) \n3) Launch the script %prog: the code creates a root file with the gen info of the produced samples (if --getGenInfo is enabled) and/or create an LHE file (if --createLHE is enabled)')
 parser.add_option("-i","--inputGridpackDir",action="store",type="string",dest="INPUTGRIDPACKDIR",default="")
 parser.add_option("-n","--genProcessName",action="store",type="string",dest="GENPROCESSNAME",default="")
 parser.add_option("-t","--tmpDir",action="store",type="string",dest="TMPDIR",default="")
@@ -24,6 +24,7 @@ parser.add_option("--getGenInfo",action="store_true",dest="GENINFO")
 parser.add_option("--createLHE",action="store_true",dest="CREATELHE")
 parser.add_option("--numberOfLHEevents",action="store",type="string",dest="NEVENTSLHE",default="10")
 parser.add_option("--numberOfCPUforLHE",action="store",type="string",dest="NCPULHE",default="2")
+parser.add_option("--EOSdir",action="store",type="string",dest="EOSDIR",default="")
 
 (options, args) = parser.parse_args()
 INPUTGRIDPACKDIR = options.INPUTGRIDPACKDIR
@@ -33,6 +34,7 @@ GENINFO = options.GENINFO
 CREATELHE = options.CREATELHE
 NEVENTSLHE = options.NEVENTSLHE
 NCPULHE = options.NCPULHE
+EOSDIR = options.EOSDIR
 
 if not options.INPUTGRIDPACKDIR:   
     parser.error('ERROR: Input gridpack directory is not given')
@@ -40,11 +42,19 @@ if not options.GENPROCESSNAME:
     parser.error('ERROR: Gen process name is not given')
 if not options.TMPDIR:   
     parser.error('ERROR: Tmp directory is not given')
+if CREATELHE:
+    if not EOSDIR:
+         parser.error('ERROR: Eos directory is not given')
 
 proc = subprocess.Popen(["ls %s | grep %s | grep tarball" % (INPUTGRIDPACKDIR,GENPROCESSNAME)], stdout=subprocess.PIPE, shell=True)
 (gridpacklist, err) = proc.communicate()
 gridpacklist = gridpacklist.splitlines()
 #print gridpacklist
+
+if GENINFO or CREATELHE:
+    #create dir on eos
+    print("eos mkdir %s/%s" % (EOSDIR,GENPROCESSNAME))
+    os.system("eos mkdir %s/%s" % (EOSDIR,GENPROCESSNAME))
 
 if GENINFO:
     # create root file
@@ -75,6 +85,12 @@ for gridpack in gridpacklist:
     os.system("mkdir -p %s" % gridpacktmpdir)
     print("cp %s/%s %s" % (INPUTGRIDPACKDIR,gridpack,gridpacktmpdir))
     os.system("cp %s/%s %s" % (INPUTGRIDPACKDIR,gridpack,gridpacktmpdir))
+
+    if GENINFO:
+        #copy gridpacks
+        print("eos cp %s/%s %s/%s/%s" % (INPUTGRIDPACKDIR,gridpack,EOSDIR,GENPROCESSNAME,gridpack))
+        os.system("eos cp %s/%s %s/%s/%s" % (INPUTGRIDPACKDIR,gridpack,EOSDIR,GENPROCESSNAME,gridpack))
+
     os.chdir(gridpacktmpdir)
     print("tar -xavf %s" % gridpack)
     os.system("tar -xavf %s" % gridpack)
@@ -91,7 +107,7 @@ for gridpack in gridpacklist:
             xsectionpb = 0
         print "xsection (pb) = "+str(xsectionpb)
 
-         # KK gluon mass (GeV)
+        # KK gluon mass (GeV)
         reader = subprocess.Popen(["grep mgkk process/madevent/Cards/param_card.dat"], stdout=subprocess.PIPE, shell=True)
         (mgkk, err) = reader.communicate()
         if mgkk:
@@ -159,15 +175,20 @@ for gridpack in gridpacklist:
     if CREATELHE:
         SEEDLHE = randint(1, 100000) 
         print("./runcmsgrid.sh %s %s %s" % (NEVENTSLHE, SEEDLHE, NCPULHE))
-        os.system("./runcmsgrid.sh %s %s %s" % (NEVENTSLHE, SEEDLHE, NCPULHE))
+        os.system("./runcmsgrid.sh %s %s %s" % (NEVENTSLHE, SEEDLHE, NCPULHE))        
+        #copy LHE
+        print("eos cp cmsgrid_final.lhe %s/%s/%s.lhe" % (EOSDIR,GENPROCESSNAME,gridpacktmpdirname))
+        os.system("eos cp cmsgrid_final.lhe %s/%s/%s.lhe" % (EOSDIR,GENPROCESSNAME,gridpacktmpdirname))
 
     os.chdir(basedir_path)
     
     #clean tmp directory
     print("rm -rf %s" % (gridpacktmpdir))
-    #os.system("rm -rf %s" % (gridpacktmpdir))
+    os.system("rm -rf %s" % (gridpacktmpdir))
 
 if GENINFO:
     f.Write()
     f.Close()
-
+    #copy file with geninfo on eos
+    print("eos cp %s/tree_%s.root %s/%s/tree_%s.root" % (INPUTGRIDPACKDIR,GENPROCESSNAME,EOSDIR,GENPROCESSNAME,GENPROCESSNAME))
+    os.system("eos cp %s/tree_%s.root %s/%s/tree_%s.root" % (INPUTGRIDPACKDIR,GENPROCESSNAME,EOSDIR,GENPROCESSNAME,GENPROCESSNAME))
