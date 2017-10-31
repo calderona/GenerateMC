@@ -40,7 +40,7 @@ RValues = [0.1,0.7,0.9]
 scram_arch=slc6_amd64_gcc481
 cmssw_version=CMSSW_7_1_30
 ```
-Note: this depends on the MC production campaign
+Note: this depends on the MC production campaign. Usually you should take the default specified in https://twiki.cern.ch/twiki/bin/view/CMS/QuickGuideMadGraph5aMCatNLO
 
 4) Launch the gridpacks production
 ```
