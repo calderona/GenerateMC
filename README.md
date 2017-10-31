@@ -35,6 +35,12 @@ cp createGridpacks.py createGridpacks_TrijetRes.py
 MGKKValues = [2000,5000]
 RValues = [0.1,0.7,0.9]
 ```
+* Edit genproductions/bin/MadGraph5_aMCatNLO/gridpack_generation.sh to set the scram_arch and cmssw_version:
+```
+scram_arch=slc6_amd64_gcc481
+cmssw_version=CMSSW_7_1_30
+```
+Note: this depends on the MC production campaign
 
 4) Launch the gridpacks production
 ```
@@ -53,7 +59,7 @@ cp genproductions/bin/MadGraph5_aMCatNLO/TrijetRes_g_ggg_BP2_testV1*tarball.tar.
 ```
 
 6) Produce LHE file and get generator level information
-* Create CMSSW area and set environment variables (same scram arch and cmssw release used to produce gridpacks at point 4)
+* Create CMSSW area and set environment variables (same scram arch and cmssw release used to produce gridpacks at point 3)
 ```
 scram p CMSSW_7_1_30
 cd CMSSW_7_1_30
@@ -78,9 +84,24 @@ python getLHEandGenInfo_TrijetRes.py -i gridpacks/TrijetRes_g_ggg_BP2_testV1 -n 
    * rbr: Radion BR (in the decay of interest: here "gluon+gluon")
 * The LHE files are stored in the specified eos directory, i.e. in this case */eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1* (together with gen info if --getGenInfo is set)
 
-
-
-
+7) Produce GEN files
+* Prepare the list with all the lhe files to be processes:
+  * Example of list.txt:
+```
+root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK2000R0p1_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
+root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK2000R0p7_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
+root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p1_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
+root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p7_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
+```
+* Copy python hadronizer in the generator folder (use same CMSSW area already prepared at point 6)
+```
+mkdir -p $CMSSW_BASE/src/Configuration/Generator/python
+cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py  $CMSSW_BASE/src/Configuration/Generator/python
+```
+* Launch script to produce GEN files
+```
+python makeGENfromLHE.py -v CMSSW_7_1_30 -c Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py -i list.txt -t /tmp/santanas/ --outputDir /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/
+```
 
 
 
