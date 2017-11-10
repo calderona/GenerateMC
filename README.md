@@ -106,7 +106,7 @@ cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_ge
 ```
 python makeGENfromLHE.py -v CMSSW_7_1_30 -c Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py -i list.txt -t /tmp/santanas/ --outputDir /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/
 ```
-* The LHE files are stored in /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/
+* The GEN files are stored in /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/
 ```
 [santanas@lxplus081 GenerateMC]$ eos ls /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/ | grep GEN
 TrijetRes_g_ggg_BP2_testV1_MGKK2000R0p1_slc6_amd64_gcc481_CMSSW_7_1_30_GEN.root
