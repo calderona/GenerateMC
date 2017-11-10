@@ -51,7 +51,11 @@ python createGridpacks_TrijetRes.py -i template_cards/TrijetRes_g_ggg_BP2_testV1
 
 5) Check and copy gridpacks in new directory
 * Gridpacks will be stored by default in *genproductions/bin/MadGraph5_aMCatNLO/*
-* Check that all batch jobs are finished successfully
+* Check that all batch jobs are finished successfully 
+* Resubmit the failed jobs using a command like this one, and then check again
+```
+./submit_gridpack_generation.sh 15000 50000 1nh TrijetRes_g_ggg_BP2_testV1_MGKK2000R0p1 cards/production/13TeV/TrijetRes_g_ggg_BP2_testV2_MGKK2000R0p1 1nh
+```
 * Copy gridpacks in a new directory
 ```
 mkdir gridpacks/TrijetRes_g_ggg_BP2_testV1
