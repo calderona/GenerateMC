@@ -97,11 +97,26 @@ root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_
 root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p1_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
 root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p7_slc6_amd64_gcc481_CMSSW_7_1_30.lhe
 ```
-* Copy python hadronizer in the generator folder (use same CMSSW area already prepared at point 6)
+* Setup python hadronizer config (use same CMSSW area already prepared at point 6)
 ```
-mkdir -p $CMSSW_BASE/src/Configuration/Generator/python
-cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py  $CMSSW_BASE/src/Configuration/Generator/python
+cp -r $CMSSW_RELEASE_BASE/src/Configuration/ $CMSSW_BASE/src/
 ```
+* Copy the the specific hadronizer you need (examples below)
+Generic: 
+```
+cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py $CMSSW_BASE/src/Configuration/Generator/python
+```
+Generic plus 1 ISR jet:
+```
+cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_MLM_5f_max1j_LHE_pythia8_cff.py $CMSSW_BASE/src/Configuration/Generator/python
+```
+* Then compile
+```
+cd $CMSSW_BASE/src/
+scram b -j8
+cd -
+```
+
 * Launch script to produce GEN files
 ```
 python makeGENfromLHE.py -v CMSSW_7_1_30 -c Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py -i list.txt -t /tmp/santanas/ --outputDir /eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_testV1/
