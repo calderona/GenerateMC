@@ -56,10 +56,10 @@ python createGridpacks_TrijetRes.py -i template_cards/TrijetRes_g_ggg_BP2_testV1
 ```
 ./submit_gridpack_generation.sh 15000 50000 1nh TrijetRes_g_ggg_BP2_testV1_MGKK2000R0p1 cards/production/13TeV/TrijetRes_g_ggg_BP2_testV2_MGKK2000R0p1 1nh
 ```
-* Copy gridpacks in a new directory
+* Move gridpacks in a new directory
 ```
 mkdir gridpacks/TrijetRes_g_ggg_BP2_testV1
-cp genproductions/bin/MadGraph5_aMCatNLO/TrijetRes_g_ggg_BP2_testV1*tarball.tar.xz gridpacks/TrijetRes_g_ggg_BP2_testV1
+mv genproductions/bin/MadGraph5_aMCatNLO/TrijetRes_g_ggg_BP2_testV1*tarball.tar.xz gridpacks/TrijetRes_g_ggg_BP2_testV1
 ```
 
 6) Produce LHE file and get generator level information
@@ -102,6 +102,7 @@ root://eoscms///eos/cms/store/cmst3/user/santanas/MCsamples/TrijetRes_g_ggg_BP2_
 cp -r $CMSSW_RELEASE_BASE/src/Configuration/ $CMSSW_BASE/src/
 ```
 * Copy the the specific hadronizer you need (examples below)
+
 Generic: 
 ```
 cp genproductions/python/ThirteenTeV/Hadronizer/Hadronizer_TuneCUETP8M1_13TeV_generic_LHE_pythia8_cff.py $CMSSW_BASE/src/Configuration/Generator/python
