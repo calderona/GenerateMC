@@ -131,7 +131,49 @@ TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p1_slc6_amd64_gcc481_CMSSW_7_1_30_GEN.root
 TrijetRes_g_ggg_BP2_testV1_MGKK5000R0p7_slc6_amd64_gcc481_CMSSW_7_1_30_GEN.root
 ```
 
+## Pythia production (pythia fragment -> GEN)
 
+1) Setup CMSSW area
+```
+scram p CMSSW_7_1_30
+cd CMSSW_7_1_30
+cmsenv
+cd ..
+```
 
+2) Define template for pythia gen fragment
+The standard is: 
+```
+template_pythia_cards/PROCESSNAME_TuneCUETP8M1_13TeV_pythia8_cfi.py
+```
+The line with THISPROCESSPARAMETERS will be replaced with the actual pythia instructions by the following script
 
+3) Create and edit script for config file production (use makeGENfromPYTHIA.py as template)
+```
+cp makeGENfromPYTHIA.py makeGENfromPYTHIA_Res1ToRes2QTo3Q.py
+```
+* Edit makeGENfromPYTHIA_Res1ToRes2QTo3Q.py: 
+  * specify samples and parameters to be generated (Note: the script should be modified depending on the specific model and this can be taken as example). For the trijet model, just edit these values (i.e. Res1 mass, mass ratio between Res2 and Res1, and relative width of Res1 and Res2 - the same):
+```
+MGKKValues = [500, 4000]
+RValues = [0.1, 0.7]
+relwidth = 0.01 # 1%
+```
+  * if you just want to produce the config files - without producing the GEN .root files - you should add 
+```
+--no_exec
+```
+in these lines (at the end, inside the quotation marks):
+```
+print("cmsDriver.py Configuration/Generator/python/%s --fileout %s/%s --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions MCRUN2_71_V1::All --step GEN --magField 38T_PostLS1 --python_filename %s -n %s" % (pythonfragment,TMPDIR,outputfilename,pythonfilename,NEVENTS) )
+os.system("cmsDriver.py Configuration/Generator/python/%s --fileout %s/%s --mc --eventcontent RAWSIM --datatier GEN-SIM --conditions MCRUN2_71_V1::All --step GEN --magField 38T_PostLS1 --python_filename %s -n %s" % (pythonfragment,TMPDIR,outputfilename,pythonfilename,NEVENTS) )
+```
 
+4) Launch the gen production
+```
+python makeGENfromPYTHIA_Res1ToRes2QTo3Q.py -n Res1ToRes2QTo3Q -v CMSSW_7_1_30 -c template_pythia_cards/PROCESSNAME_TuneCUETP8M1_13TeV_pythia8_cfi.py -t /tmp/santanas --outputDir /eos/cms/store/cmst3/user/santanas/MCsamples/Res1ToRes2QTo3Q --numberOfevents 1000
+```
+* Jobs are processed one after the other, in local
+* The output directory can be on eos or in local (afs) directory
+* The gen fragments are in $CMSSW_BASE/src/ (these files should be provided to gen group for official production)
+* The final configuration files are in $CMSSW_BASE/src/Configuration/Generator/python/ (these are used to generate privately the GEN .root files in this step)
