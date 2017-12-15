@@ -175,5 +175,5 @@ python makeGENfromPYTHIA_Res1ToRes2QTo3Q.py -n Res1ToRes2QTo3Q -v CMSSW_7_1_30 -
 ```
 * Jobs are processed one after the other, in local
 * The output directory can be on eos or in local (afs) directory
-* The gen fragments are in $CMSSW_BASE/src/ (these files should be provided to gen group for official production)
-* The final configuration files are in $CMSSW_BASE/src/Configuration/Generator/python/ (these are used to generate privately the GEN .root files in this step)
+* The gen fragments are in $CMSSW_BASE/src/Configuration/Generator/python/ (these files should be provided to gen group for official production)
+* The final configuration files are in $CMSSW_BASE/src/ (these are used to generate privately the GEN .root files in this step)
